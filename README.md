@@ -5,7 +5,7 @@ Compact RAG app that ingests LinkedIn, Twitter/X, and Instagram exports, stores 
 ## Stack
 - Backend: FastAPI + Python
 - Vector store: Qdrant, with in-memory fallback
-- Embeddings: OpenAI first, `sentence-transformers` fallback, hash fallback last
+- Embeddings: OpenAI first, deterministic fallback second
 - Frontend: Vite + React
 
 ## Requirements
@@ -25,6 +25,7 @@ Compact RAG app that ingests LinkedIn, Twitter/X, and Instagram exports, stores 
    QDRANT_API_KEY=your_qdrant_key
    CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
    VITE_API_URL=http://localhost:8000
+   ENABLE_LOCAL_EMBEDDINGS=false
    ```
 2. Install backend deps:
    ```bash
@@ -69,7 +70,7 @@ Compact RAG app that ingests LinkedIn, Twitter/X, and Instagram exports, stores 
 
 ## Behavior
 - OpenAI embeddings are tried first when a key is present.
-- If OpenAI fails, the app falls back to `sentence-transformers`.
+- If OpenAI fails, the app falls back to deterministic local embeddings.
 - If both fail, the app uses deterministic local fallback vectors.
 - Chat stays local-only in this build to avoid OpenAI rate/session limits.
 

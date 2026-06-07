@@ -20,6 +20,7 @@ class Embedder:
         self._client = None
         self._local_model = None
         self._mode = "fallback"
+        self._enable_local_embeddings = os.getenv("ENABLE_LOCAL_EMBEDDINGS", "").strip().lower() in {"1", "true", "yes", "on"}
         self._init_clients()
 
     def _init_clients(self) -> None:
@@ -35,17 +36,20 @@ class Embedder:
             except Exception as exc:
                 print(f"[embedder] OpenAI client unavailable: {exc}")
 
-        try:
-            from sentence_transformers import SentenceTransformer
+        if self._enable_local_embeddings:
+            try:
+                from sentence_transformers import SentenceTransformer
 
-            print("[embedder] loading local sentence-transformers model (first run downloads ~90MB)...")
-            self._local_model = SentenceTransformer("all-MiniLM-L6-v2")
-            if self._mode != "openai":
-                self._mode = "local"
-                self.dimension = 384  # Native Sentence-Transformers size
-            print("[embedder] local model ready (all-MiniLM-L6-v2, 384 dims)")
-        except Exception as exc:
-            print(f"[embedder] sentence-transformers unavailable: {exc}")
+                print("[embedder] loading local sentence-transformers model (first run downloads ~90MB)...")
+                self._local_model = SentenceTransformer("all-MiniLM-L6-v2")
+                if self._mode != "openai":
+                    self._mode = "local"
+                    self.dimension = 384  # Native Sentence-Transformers size
+                print("[embedder] local model ready (all-MiniLM-L6-v2, 384 dims)")
+            except Exception as exc:
+                print(f"[embedder] sentence-transformers unavailable: {exc}")
+        else:
+            print("[embedder] local embeddings disabled; using OpenAI or fallback only")
 
         if self._client is None and self._local_model is None:
             print("[embedder] no OpenAI or local model available, using fallback embeddings")
@@ -71,6 +75,18 @@ class Embedder:
             loop = asyncio.get_running_loop()
             embeddings = await loop.run_in_executor(None, self._embed_local, texts)
             return embeddings
+
+        if self._mode == "local" and self._local_model is None and self._enable_local_embeddings:
+            try:
+                from sentence_transformers import SentenceTransformer
+
+                print("[embedder] lazily loading local sentence-transformers model")
+                self._local_model = SentenceTransformer("all-MiniLM-L6-v2")
+                loop = asyncio.get_running_loop()
+                embeddings = await loop.run_in_executor(None, self._embed_local, texts)
+                return embeddings
+            except Exception as exc:
+                print(f"[embedder] lazy local model load failed: {exc}")
 
         print(f"[embedder] generating {len(texts)} fallback embedding(s)")
         return [self._fallback_embedding(text) for text in texts]
