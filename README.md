@@ -23,7 +23,8 @@ Compact RAG app that ingests LinkedIn, Twitter/X, and Instagram exports, stores 
    OPENAI_CHAT_MODEL=gpt-4o
    QDRANT_URL=your_qdrant_url
    QDRANT_API_KEY=your_qdrant_key
-   CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+   CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173,https://cortex-frontend-u7ma.onrender.com
+   CORS_ORIGIN_REGEX=^https://.*\.onrender\.com$
    VITE_API_URL=http://localhost:8000
    ENABLE_LOCAL_EMBEDDINGS=false
    ```
@@ -63,7 +64,7 @@ Compact RAG app that ingests LinkedIn, Twitter/X, and Instagram exports, stores 
   - Create a Python web service from `render.yaml`.
   - Set `QDRANT_URL` and `QDRANT_API_KEY` to your Qdrant Cloud values.
   - Set `OPENAI_API_KEY` and `OPENAI_CHAT_MODEL` if you use OpenAI embeddings.
-  - Set `CORS_ORIGINS` to your Vercel URL, for example `https://your-app.vercel.app`.
+  - Set `CORS_ORIGIN_REGEX` to match your frontend host if it is not on Render.
 - Frontend on Vercel:
   - Set `VITE_API_URL` to your Render backend URL, for example `https://your-api.onrender.com`.
   - Rebuild after changing env vars because Vite bakes them in at build time.

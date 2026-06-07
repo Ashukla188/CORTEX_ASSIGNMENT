@@ -26,6 +26,7 @@ def _load_cors_origins() -> list[str]:
     local_origins = {
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "https://cortex-frontend-u7ma.onrender.com",
     }
     env_origins = {
         origin.strip().rstrip("/")
@@ -33,6 +34,13 @@ def _load_cors_origins() -> list[str]:
         if origin.strip()
     }
     return sorted(local_origins | env_origins)
+
+
+def _load_cors_origin_regex() -> str | None:
+    regex = os.getenv("CORS_ORIGIN_REGEX", "").strip()
+    if regex:
+        return regex
+    return r"^https://.*\.onrender\.com$"
 
 
 class ChatRequest(BaseModel):
@@ -45,6 +53,7 @@ def create_app() -> FastAPI:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=_load_cors_origins(),
+        allow_origin_regex=_load_cors_origin_regex(),
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -54,6 +63,7 @@ def create_app() -> FastAPI:
     # If startup fails here, check package installs, QDRANT_URL, and OPENAI_API_KEY.
     print("[startup] initializing shared services")
     print(f"[startup] cors_origins={_load_cors_origins()}")
+    print(f"[startup] cors_origin_regex={_load_cors_origin_regex()!r}")
     embedder = Embedder()
     store = QdrantStore()
     ingestor = Ingestor(embedder, store)
