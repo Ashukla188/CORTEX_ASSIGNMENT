@@ -1,0 +1,15 @@
+{
+  "tweets": [
+    {
+      "id_str": "101",
+      "created_at": "2025-02-01T12:00:00Z",
+      "text": "AI products should make the hard parts visible, not hide them."
+    },
+    {
+      "id_str": "102",
+      "created_at": "2025-02-04T16:00:00Z",
+      "text": "The best teams default to clarity over cleverness."
+    }
+  ]
+}
+

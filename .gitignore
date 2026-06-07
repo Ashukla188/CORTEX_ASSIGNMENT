@@ -1,0 +1,8 @@
+.env
+backend/.env
+frontend/.env
+CODEFLOW_MAP.md
+backend/__pycache__/
+backend/**/*.pyc
+frontend/node_modules/
+frontend/dist/

@@ -1,0 +1,15 @@
+{
+  "posts": [
+    {
+      "id": "201",
+      "created_at": "2025-02-07T09:00:00Z",
+      "caption": "Building systems is mostly choosing the right tradeoffs early."
+    },
+    {
+      "id": "202",
+      "created_at": "2025-02-09T09:00:00Z",
+      "caption": "Good design feels calm because the structure is doing the work."
+    }
+  ]
+}
+
